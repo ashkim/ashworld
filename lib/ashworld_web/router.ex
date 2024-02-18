@@ -8,6 +8,8 @@ defmodule AshworldWeb.Router do
     plug :put_root_layout, html: {AshworldWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
+    plug :fetch_current_cart
   end
 
   pipeline :api do
@@ -21,6 +23,35 @@ defmodule AshworldWeb.Router do
     get "/redirect_test", PageController, :redirect_test
     get "/hello", HelloController, :index
     get "/hello/:messenger", HelloController, :show
+
+    resources "/products", ProductController
+    resources "/cart_items", CartItemController, only: [:create, :delete]
+
+    get "/cart", CartController, :show
+    put "/cart", CartController, :update
+  end
+
+  defp fetch_current_user(conn, _) do
+    if user_uuid = get_session(conn, :current_uuid) do
+      assign(conn, :current_uuid, user_uuid)
+    else
+      new_uuid = Ecto.UUID.generate()
+
+      conn
+      |> assign(:current_uuid, new_uuid)
+      |> put_session(:current_uuid, new_uuid)
+    end
+  end
+
+  alias Ashworld.ShoppingCart
+
+  defp fetch_current_cart(conn, _opts) do
+    if cart = ShoppingCart.get_cart_by_user_uuid(conn.assigns.current_uuid) do
+      assign(conn, :cart, cart)
+    else
+      {:ok, new_cart} = ShoppingCart.create_cart(conn.assigns.current_uuid)
+      assign(conn, :cart, new_cart)
+    end
   end
 
   # Other scopes may use custom stacks.
