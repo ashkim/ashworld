@@ -11,14 +11,8 @@ defmodule AshworldWeb.PageController do
     # |> put_resp_content_type("text/plain")
     # |> send_resp(201, "")
 
-    redirect(conn, to: ~p"/redirect_test")
+    redirect(conn, to: ~p"/products")
 
   end
 
-  @spec redirect_test(Plug.Conn.t(), any()) :: Plug.Conn.t()
-  def redirect_test(conn, _params) do
-    conn
-    |> put_flash(:error, "Let's pretend we have an error.")
-    |> render(:home, layout: false)
-  end
 end
