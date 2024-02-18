@@ -142,14 +142,6 @@ defmodule Ashworld.Catalog do
   """
   def list_categories_by_id(nil), do: []
 
-  @doc """
-  Returns the list of categories by id.
-
-  ## Examples
-
-      iex> list_categories_by_id([1, 2, 3])
-      [%Category{}, ...]
-  """
   def list_categories_by_id(category_ids) do
     Repo.all(from c in Category, where: c.id in ^category_ids)
   end
